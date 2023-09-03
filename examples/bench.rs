@@ -1,6 +1,6 @@
 use benchmark_simple::{Bench, Options};
 
-use sm4_gcm::Sm4GcmStreamEncryptor;
+use sm4_gcm::{Sm4GcmStreamEncryptor, Sm4Key};
 
 fn main() {
     let bench = Bench::new();
@@ -21,9 +21,9 @@ fn main() {
 
 
 fn test_sm4_encrypt(m: &mut [u8]) {
-    let key = [0u8; 16];
+    let key = Sm4Key([0u8; 16]);
     let nonce = [0u8; 12];
-    let mut encryptor = Sm4GcmStreamEncryptor::new(key, &nonce);
+    let mut encryptor = Sm4GcmStreamEncryptor::new(&key, &nonce);
 
     encryptor.update(m);
     encryptor.finalize();

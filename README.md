@@ -1,9 +1,21 @@
 # sm4-gcm
 
-PENGING...
+Encrypt & Decrypt test code:
+```rust
+fn main() {
+    let key = Sm4Key([0u8; 16]);
+    let nonce = [0u8; 12];
+    let plaintext = b"Hello World!";
+
+    let ciphertext = sm4_gcm::sm4_gcm_encrypt(&key, &nonce, plaintext);
+    println!("Encrypted: {}", hex::encode(&ciphertext));
+    let decrypted = sm4_gcm::sm4_gcm_decrypt(&key, &nonce, &ciphertext).unwrap();
+    println!("Decrypted: {}", String::from_utf8_lossy(&decrypted));
+}
+```
 
 
-BC test code:
+Generate test vector BC test code:
 ```java
 public static void encryptGcmNoPadding(String key, String data, String nonce, String associatedData) throws Exception {
     Cipher cipher = Cipher.getInstance("SM4/GCM/NoPadding", BouncyCastleProvider.PROVIDER_NAME);
@@ -20,3 +32,8 @@ public static void encryptGcmNoPadding(String key, String data, String nonce, St
 ```
 
 
+Benchmark @MacBook Pro (Retina, 15-inch, Late 2013/2 GHz Quad-Core Intel Core i7)
+```text
+$ cargo run --release --example bench
+SM4/GCM encrypt : 65.69 M/s
+```

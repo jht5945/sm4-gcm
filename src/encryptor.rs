@@ -5,13 +5,13 @@ use sm4::cipher::generic_array::GenericArray;
 use sm4::Sm4;
 use zeroize::Zeroize;
 
-use crate::util::{BLOCK_SIZE, inc_32, msb_s, normalize_nonce, Sm4Block, u8to128};
+use crate::util::{BLOCK_SIZE, inc_32, msb_s, normalize_nonce, Sm4Block, Sm4Key, u8to128};
 
-pub fn sm4_gcm_encrypt(key: [u8; 16], nonce: &[u8], message: &[u8]) -> Vec<u8> {
+pub fn sm4_gcm_encrypt(key: &Sm4Key, nonce: &[u8], message: &[u8]) -> Vec<u8> {
     sm4_gcm_aad_encrypt(key, nonce, &[], message)
 }
 
-pub fn sm4_gcm_aad_encrypt(key: [u8; 16], nonce: &[u8], aad: &[u8], message: &[u8]) -> Vec<u8> {
+pub fn sm4_gcm_aad_encrypt(key: &Sm4Key, nonce: &[u8], aad: &[u8], message: &[u8]) -> Vec<u8> {
     let mut encryptor = Sm4GcmStreamEncryptor::new(key, nonce);
     if aad.len() > 0 {
         encryptor.init_adata(aad);
@@ -34,17 +34,18 @@ pub struct Sm4GcmStreamEncryptor {
 }
 
 impl Sm4GcmStreamEncryptor {
-    pub fn new(key: [u8; 16], nonce: &[u8]) -> Self {
-        let key = GenericArray::from(key);
-        let aes = Sm4::new(&key);
+    pub fn new(key: &Sm4Key, nonce: &[u8]) -> Self {
+        let mut key = GenericArray::from(key.0);
+        let cipher = Sm4::new(&key);
 
         let mut ghash_key = ghash::Key::default();
-        aes.encrypt_block(&mut ghash_key);
+        cipher.encrypt_block(&mut ghash_key);
         let ghash = GHash::new(&ghash_key);
         ghash_key.zeroize();
+        key.zeroize();
 
         let mut s = Self {
-            cipher: aes,
+            cipher,
             message_buffer: vec![],
             ghash,
             init_nonce: 0,

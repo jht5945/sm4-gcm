@@ -1,5 +1,8 @@
+use std::error::Error;
+
 use sm4::cipher::BlockSizeUser;
 use sm4::cipher::consts::U16;
+use zeroize::Zeroize;
 
 pub(crate) struct Sm4Block {}
 
@@ -8,6 +11,20 @@ impl BlockSizeUser for Sm4Block {
 }
 
 pub(crate) const BLOCK_SIZE: usize = 16;
+
+pub struct Sm4Key(pub [u8; 16]);
+
+impl Sm4Key {
+    pub fn from_slice(key: &[u8]) -> Result<Self, Box<dyn Error>> {
+        Ok(Self(key.try_into()?))
+    }
+}
+
+impl Drop for Sm4Key {
+    fn drop(&mut self) {
+        self.0.zeroize();
+    }
+}
 
 
 // R = 11100001 || 0(120)
