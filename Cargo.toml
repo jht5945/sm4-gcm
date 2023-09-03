@@ -1,6 +1,6 @@
 [package]
 name = "sm4-gcm"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Hatter Jiang"]
 repository = "https://git.hatter.ink/hatter/sm4-gcm"

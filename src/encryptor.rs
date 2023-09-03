@@ -13,7 +13,7 @@ pub fn sm4_gcm_encrypt(key: &Sm4Key, nonce: &[u8], message: &[u8]) -> Vec<u8> {
 
 pub fn sm4_gcm_aad_encrypt(key: &Sm4Key, nonce: &[u8], aad: &[u8], message: &[u8]) -> Vec<u8> {
     let mut encryptor = Sm4GcmStreamEncryptor::new(key, nonce);
-    if aad.len() > 0 {
+    if !aad.is_empty() {
         encryptor.init_adata(aad);
     }
     let mut enc1 = encryptor.update(message);
@@ -60,7 +60,7 @@ impl Sm4GcmStreamEncryptor {
     }
 
     pub fn init_adata(&mut self, adata: &[u8]) {
-        if adata.len() > 0 {
+        if !adata.is_empty() {
             self.adata_len += adata.len();
             self.ghash.update_padded(adata);
         }
@@ -126,12 +126,12 @@ impl Sm4GcmStreamEncryptor {
     }
 
     fn compute_tag(&mut self) -> Vec<u8> {
-        let mut bs = self.init_nonce.to_be_bytes().clone();
+        let mut bs = self.init_nonce.to_be_bytes();
         let block = Block::<Sm4Block>::from_mut_slice(&mut bs);
         self.cipher.encrypt_block(block);
         let ghash = self.ghash.clone().finalize();
         let tag_trunk = ghash.as_slice();
-        let y = u8to128(&tag_trunk) ^ u8to128(&block.as_slice());
+        let y = u8to128(tag_trunk) ^ u8to128(block.as_slice());
         y.to_be_bytes().to_vec()
     }
 
@@ -139,7 +139,7 @@ impl Sm4GcmStreamEncryptor {
         let mut block = [0u8; BLOCK_SIZE];
         let block = Block::<Sm4Block>::from_mut_slice(&mut block);
         self.cipher.encrypt_block(block);
-        u8to128(&block.as_slice())
+        u8to128(block.as_slice())
     }
 
     fn normalize_nonce(&mut self, nonce_bytes: &[u8]) -> (u128, u128) {
