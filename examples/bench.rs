@@ -3,23 +3,6 @@ use benchmark_simple::{Bench, Options};
 use sm4_gcm::Sm4GcmStreamEncryptor;
 
 fn main() {
-    let key = [0u8; 16];
-    let nonce = [0u8; 12];
-    let mut e = Sm4GcmStreamEncryptor::new(key, &nonce);
-
-    println!("{}", hex::encode(&key));
-    println!("{}", hex::encode(&nonce));
-
-    let a = e.update(b"hello world");
-    let (b, t) = e.finalize();
-
-    let mut enc = a.clone();
-    enc.extend_from_slice(&b);
-    enc.extend_from_slice(&t);
-
-    println!("{}", hex::encode(&enc));
-
-    // ----------------------------------------------------------------------
     let bench = Bench::new();
     let mut m = vec![0xd0u8; 16384];
 

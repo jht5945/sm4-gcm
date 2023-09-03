@@ -1,8 +1,11 @@
+pub use encryptor::Sm4GcmStreamEncryptor;
+
+pub use crate::encryptor::sm4_gcm_aad_encrypt;
+pub use crate::encryptor::sm4_gcm_encrypt;
+
 mod util;
 mod encryptor;
-
-pub use encryptor::Sm4GcmStreamEncryptor;
-use crate::encryptor::sm4_gcm_aad_encrypt;
+mod decryptor;
 
 // Test vectors are all from BC
 #[test]
