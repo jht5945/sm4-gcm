@@ -11,4 +11,10 @@ categories = ["cryptography"]
 
 
 [dependencies]
-sm4 = "0.5.1"
+ghash = { version = "0.5.0", features = ["zeroize"] }
+sm4 = { version = "0.5.1", features = ["zeroize"] }
+zeroize = "1.6.0"
+
+[dev-dependencies]
+hex = "0.4.3"
+benchmark-simple = "0.1.8"
